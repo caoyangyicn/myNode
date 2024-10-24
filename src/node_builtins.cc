@@ -384,12 +384,10 @@ MaybeLocal<Function> BuiltinLoader::LookupAndCompile(Local<Context> context,
   //                           getInternalBinding, primordials
   if (strcmp(id, "internal/bootstrap/realm") == 0) {
     parameters = {
-        // ,
         FIXED_ONE_BYTE_STRING(isolate, "process"),
         FIXED_ONE_BYTE_STRING(isolate, "getLinkedBinding"),
         FIXED_ONE_BYTE_STRING(isolate, "getInternalBinding"),
         FIXED_ONE_BYTE_STRING(isolate, "primordials"),
-        FIXED_ONE_BYTE_STRING(isolate, "getLog")
     };
   } else if (strncmp(id,
                      "internal/per_context/",
@@ -441,26 +439,18 @@ MaybeLocal<Value> BuiltinLoader::CompileAndCall(Local<Context> context,
   if (strcmp(id, "internal/bootstrap/realm") == 0) {
     Local<Value> get_linked_binding;
     Local<Value> get_internal_binding;
-    Local<Value> get_log;
     if (!NewFunctionTemplate(isolate, binding::GetLinkedBinding)
              ->GetFunction(context)
              .ToLocal(&get_linked_binding) ||
         !NewFunctionTemplate(isolate, binding::GetInternalBinding)
              ->GetFunction(context)
-             .ToLocal(&get_internal_binding)
-        ||
-        !NewFunctionTemplate(isolate, binding::GetLog)
-             ->GetFunction(context)
-             .ToLocal(&get_log)
-        ) {
+             .ToLocal(&get_internal_binding)) {
       return MaybeLocal<Value>();
     }
     arguments = {realm->process_object(),
                  get_linked_binding,
                  get_internal_binding,
-                 realm->primordials(),
-                 get_log
-                 };
+                 realm->primordials()};
   } else if (strncmp(id, "internal/main/", strlen("internal/main/")) == 0 ||
              strncmp(id,
                      "internal/bootstrap/",

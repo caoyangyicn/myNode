@@ -639,13 +639,8 @@ void GetInternalBinding(const FunctionCallbackInfo<Value>& args) {
 
   CHECK(args[0]->IsString());
 
-
-
   Local<String> module = args[0].As<String>();
   node::Utf8Value module_v(isolate, module);
-  
-  // printf("Module Value: %s\n", *module_v);
-
   Local<Object> exports;
 
   node_module* mod = FindModule(modlist_internal, *module_v, NM_F_INTERNAL);
@@ -658,31 +653,6 @@ void GetInternalBinding(const FunctionCallbackInfo<Value>& args) {
 
   args.GetReturnValue().Set(exports);
 }
-
-
-// 新增打印函数
-void GetLog(const FunctionCallbackInfo<Value>& args) {
-  Realm* realm = Realm::GetCurrent(args);
-  Isolate* isolate = realm->isolate();
-  HandleScope scope(isolate);
-  Local<Context> context = isolate->GetCurrentContext();
-
-  std::string argsString = "Arguments: ";
-  for (int i = 0; i < args.Length(); i++) {
-      Local<Value> arg = args[i];
-
-      if (i > 0) {
-          argsString += ", "; // 添加逗号分隔多个参数
-      }
-
-      String::Utf8Value str(isolate, arg);
-      argsString += std::string(*str);
-  }
-
-  // 将结果打印到控制台
-  printf("%s\n", argsString.c_str());
-}
-
 
 void GetLinkedBinding(const FunctionCallbackInfo<Value>& args) {
   Environment* env = Environment::GetCurrent(args);
@@ -745,7 +715,6 @@ void RegisterBuiltinBindings() {
 void RegisterExternalReferences(ExternalReferenceRegistry* registry) {
   registry->Register(GetLinkedBinding);
   registry->Register(GetInternalBinding);
-  registry->Register(GetLog);
 }
 
 }  // namespace binding
